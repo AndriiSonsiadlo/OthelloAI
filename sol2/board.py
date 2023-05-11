@@ -4,50 +4,55 @@ from collections import defaultdict
 import numpy as np
 
 from colorama import init, Fore, Back, Style
+
 init(autoreset=True)
 
 
-class Board(object):
+class Board:
     BLACK = 1
     WHITE = -1
 
-    def __init__(self):
-        self.board = np.zeros((8,8), int)
+    def __init__(self, board_size=8):
+        self.board_size = board_size
+        self.board = np.zeros((board_size, board_size), int)
+        self.init_state()
+
+        self.remaining_squares = board_size * board_size - 4
+        self.score = {Board.BLACK: 2, Board.WHITE: 2}
+
+    def init_state(self):
         self.board[3][3] = Board.BLACK
         self.board[4][4] = Board.BLACK
         self.board[4][3] = Board.WHITE
         self.board[3][4] = Board.WHITE
 
-        self.remaining_squares = 8*8 - 4
-        self.score = {Board.BLACK: 2, Board.WHITE: 2}
-
-    def getScore(self):
+    def get_score(self):
         return self.score
 
-    def getState(self):
+    def get_state(self):
         return self.board
 
-    def isOnBoard(self, x, y):
+    def is_on_board(self, x, y):
         """
         Returns True if the coordinates are located on the board.
         """
-        return x >= 0 and x <= 7 and y >= 0 and y <= 7
+        return 0 <= x < self.board_size and 0 <= y < self.board_size
 
-    def updateBoard(self, tile, row, col):
+    def update_board(self, tile, row, col):
         """
         @param int tile
             either 1 or -1
                  1 for player 1 (black)
                 -1 for player 2 (white)
         @param int row
-            0-7 which row
+            0-board_size which row
         @param int col
-            0-7 which col
+            0-board_size which col
         @return bool
             true if valid
             false if invalid move - doesn't update board
         """
-        result = self.isValidMove(tile, row, col)
+        result = self.is_valid_move(tile, row, col)
         if result:
             # Flip the disks
             self.board[row][col] = tile
@@ -59,7 +64,7 @@ class Board(object):
 
             # The gross expression is a mapping for -1 -> 1 and 1 -> -1
             # Rescales the range to [0,1] then mod 2 then rescale back to [-1,1]
-            self.score[(((tile+1)//2+1)%2)*2-1] -= len(result)
+            self.score[(((tile + 1) // 2 + 1) % 2) * 2 - 1] -= len(result)
 
             # Number of open squares decreases by 1
             self.remaining_squares -= 1
@@ -69,9 +74,8 @@ class Board(object):
         else:
             return False
 
-    def isValidMove(self, tile, xstart, ystart):
+    def is_valid_move(self, tile, xstart, ystart):
         """
-        From https://inventwithpython.com/reversi.py
         @param int tile
             self.BLACK or self.WHITE
         @param int xstart
@@ -80,7 +84,7 @@ class Board(object):
         If it is a valid move, returns a list of spaces that would become the
         player's if they made a move here.
         """
-        if not self.isOnBoard(xstart, ystart) or self.board[xstart][ystart] != 0:
+        if not self.is_on_board(xstart, ystart) or self.board[xstart][ystart] != 0:
             return False
 
         # temporarily set the tile on the board.
@@ -90,23 +94,23 @@ class Board(object):
 
         tiles_to_flip = []
         # loop through all directions around flipped tile
-        for xdirection, ydirection in ((0,1),(1,1),(1,0),(1,-1),(0,-1),(-1,-1),(-1,0),(-1,1)):
+        for xdirection, ydirection in ((0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)):
             x, y = xstart, ystart
-            x += xdirection # first step in the direction
-            y += ydirection # first step in the direction
-            if self.isOnBoard(x, y) and self.board[x][y] == otherTile:
+            x += xdirection  # first step in the direction
+            y += ydirection  # first step in the direction
+            if self.is_on_board(x, y) and self.board[x][y] == otherTile:
                 # There is a piece belonging to the other player next to our piece.
                 x += xdirection
                 y += ydirection
-                if not self.isOnBoard(x, y):
+                if not self.is_on_board(x, y):
                     continue
                 while self.board[x][y] == otherTile:
                     x += xdirection
                     y += ydirection
-                    if not self.isOnBoard(x, y):
+                    if not self.is_on_board(x, y):
                         # break out of while loop, then continue in for loop
                         break
-                if not self.isOnBoard(x, y):
+                if not self.is_on_board(x, y):
                     continue
                 if self.board[x][y] == tile:
                     # There are pieces to flip over. Go in the reverse direction
@@ -125,25 +129,24 @@ class Board(object):
         # If no tiles were flipped, this is not a valid move.
         return tiles_to_flip
 
-    def printBoard(self):
+    def print_board(self):
         """
-        Print board to terminal for debugging
+        Print board to terminal
         """
 
-        def getItem(item):
-            if item == Board.BLACK :
-                return Fore.WHITE + "|" + Fore.BLACK + "O"
-            elif item == Board.WHITE :
-                return Fore.WHITE + "|" + Fore.WHITE + "O"
+        def get_item(item):
+            if item == Board.BLACK:
+                return Fore.WHITE + "|" + Fore.BLUE + "O"
+            elif item == Board.WHITE:
+                return Fore.WHITE + "|" + Fore.RED + "O"
             else:
                 return Fore.WHITE + "| "
 
-        def getRow(row):
-            return "".join(map(getItem,row))
+        def get_row(row):
+            return "".join(map(get_item, row))
 
-        print("\t" + Back.LIGHTBLACK_EX +              "      BOARD      ")
-        print("\t" + Back.LIGHTBLACK_EX + Fore.WHITE + " |0|1|2|3|4|5|6|7")
-        for i in range(8):
-            print("\t" + Back.LIGHTBLACK_EX + Fore.WHITE + "{}{}".format(i,
-                getRow(self.board[i])))
+        print("\t" + Back.BLACK + f"{'BOARD':^18}")
+        print("\t" + Back.BLACK + Fore.WHITE + f"  |{'|'.join(map(str, range(1, self.board_size+1)))}")
+        for i in range(self.board_size):
+            print("\t" + Back.BLACK + Fore.WHITE + f"{i + 1:<2}{get_row(self.board[i]):<2}")
             sys.stdout.write(Style.RESET_ALL)

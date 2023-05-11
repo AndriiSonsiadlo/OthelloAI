@@ -1,15 +1,23 @@
 import itertools
 import random
+from abc import ABC, abstractmethod
 
 import numpy as np
 
 import nn
+from sol2.board import Board
 
 
-class RLPlayer:
-    def __init__(self, q_lr, discount_factor, net_lr=0.01):
+class PlayerModel:
+    def play(self, place_func, board, board_state, me, log_history=True):
+        pass
+
+
+class RLPlayer(PlayerModel):
+    def __init__(self, q_lr, discount_factor, net_lr=0.01, board_size=8):
         # We ougth to use softmax in this
-        self.policy_net = nn.NN([64, 128, 128, 64, 64], net_lr)
+        # self.policy_net = nn.NN([64, 128, 128, 64, 64], net_lr)
+        self.policy_net = nn.NN([board_size ** 2, board_size ** 2 * 2,  board_size ** 2 * 2,  board_size ** 2,  board_size ** 2], net_lr)
 
         # This ought to decay
         self.epsilon = 0.6
@@ -20,11 +28,12 @@ class RLPlayer:
         self.play_history = []
         self.wins = 0
 
-    def play(self, place_func, board_state, me, log_history=True):
+    def play(self, place_func, board: Board, board_state, me, log_history=True):
         # Transform all of "this player's" tokens to 1s and the other player's
         # to -1s
         input_state = np.apply_along_axis(lambda x: int((x == me and 1) or (x != 0 and -1)),
-                                          1, board_state.reshape((64, 1))).reshape((64, 1))
+                                          1, board_state.reshape((board.board_size ** 2, 1))).reshape(
+            (board.board_size ** 2, 1))
         made_move = False
         pos = None
 
@@ -41,7 +50,7 @@ class RLPlayer:
                 return False
 
         else:
-            out = self.policy_net.getOutput(input_state)
+            out = self.policy_net.get_output(input_state)
             # Sort the possible moves lowest to highest desire
             positions = [(v, i) for i, v in enumerate(out)]
             positions.sort(key=lambda x: x[0], reverse=True)
@@ -50,7 +59,7 @@ class RLPlayer:
                 # Grab next desired move point
                 scalar_play_point = positions.pop()[1]
                 # Convert the scalar to a 2D coordinate to play on the board
-                pos = scalar_play_point // 8, scalar_play_point % 8
+                pos = scalar_play_point // board.board_size, scalar_play_point % board.board_size
                 made_move = place_func(*pos)
 
             # If we can make no move... pass
@@ -65,7 +74,7 @@ class RLPlayer:
     def update_weights(self, final_score):
         i = 0
         state, action = self.play_history[i]
-        q = self.policy_net.getOutput(state)
+        q = self.policy_net.get_output(state)
         n_play_history = len(self.play_history)
         while i < n_play_history:
             i += 1
@@ -77,11 +86,11 @@ class RLPlayer:
 
             else:
                 state_, action_ = self.play_history[i]
-                q_ = self.policy_net.getOutput(state_)
+                q_ = self.policy_net.get_output(state_)
                 # q[action] += self.q_lr * (self.discount_factor * np.max(q_) - q[action])
                 q[action] += self.discount_factor * np.max(q_)
 
-            self.policy_net.backProp(state, self.policy_net.mkVec(q))
+            self.policy_net.back_prop(state, self.policy_net.mk_vec(q))
 
             if i != n_play_history:
                 action, q = action_, q_
@@ -94,15 +103,19 @@ class RLPlayer:
 #            self.policy_net.backProp(state, t)
 
 
-class HumanPlayer:
-    def play(self, place_func, board_state, me, _):
-        try:
-            pos = map(int, map(str.strip, input().split(" ")))
-            place_func(*pos)
-            return True
-        except ValueError:
-            return False
+class HumanPlayer(PlayerModel):
+    def play(self, place_func, board_state, board, me, log_history=True):
+        while True:
+            try:
+                while len(pos := list(map(int, map(str.strip, input().split(" "))))) != 2:
+                    print("Please enter two numbers separated by a space.")
 
+                if place_func(pos[0]-1, pos[1]-1):
+                    return True
+            except ValueError:
+                pass
+
+            print("Invalid values. Please enter two numbers (row and col) separated by a space.")
 
 def OneHot(index, dim):
     """

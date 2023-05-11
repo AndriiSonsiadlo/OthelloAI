@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from datetime import datetime
 from pprint import pprint
 
 import numpy as np
@@ -6,19 +7,22 @@ import numpy as np
 from game import Game
 from players import RLPlayer
 
-# from matplotlib import pyplot as plt
-# plt.ion()
+from matplotlib import pyplot as plt
+plt.ion()
 
 # qlr,gamma,netlr (0.03)
-player = RLPlayer(0.07, 0.99, 0.03)
-rp = RLPlayer(0, 0)
 
+board_size = 10
 match_size = 10
-n_epochs = 2000
+n_epochs = 18
+
+player = RLPlayer(0.07, 0.99, 0.03, board_size=board_size)
+rp = RLPlayer(0, 0, board_size=board_size)
+
 
 player_wins = []
-for e in range(n_epochs):
-    print("Epoch: %d" % e)
+for e in range(1, n_epochs+1):
+    print(f"Epoch: {e}")
 
     player.wins = 0
     # Anneal the exploration rate
@@ -30,15 +34,11 @@ for e in range(n_epochs):
         player.play_history = []
 
         # Initialize a new game
-        g = Game()
-        g.addPlayer(player)
-        # Adds a player that won't log to it's move history
-        g.addPlayer(rp, False)
-        # g.addPlayer(player, False)
+        g = Game(player_1=player, log_history_1=True, player_2=rp, log_history_2=False, board_size=board_size)
         g.run()
         # pprint(player.play_history)
 
-        final_score = list(g.getScore().items())
+        final_score = list(g.get_score().items())
         final_score.sort()
         ttl = sum(map(lambda x: x[1], final_score))
         # print(ttl)
@@ -58,12 +58,13 @@ for e in range(n_epochs):
         player.update_weights(score)
 
 suffix = "linear-0.03"
-player.policy_net.save("best-%s.weights" % suffix)
+filename = f"{datetime.now().strftime('%d%H%M%S')}-{n_epochs}-{match_size}-{board_size}-best-{suffix}"
+player.policy_net.save(f"{filename}.weights")
 print(sum(player_wins))
-with open("%d-%d-%s.csv" % (n_epochs, match_size, suffix), "w") as f:
+with open(f"{filename}.csv", "w") as f:
     f.write("\n".join(map(str, player_wins)))
 
-# plt.plot(player_wins)
-# plt.draw()
-# plt.ioff()
-# plt.show()
+plt.plot(player_wins)
+plt.draw()
+plt.ioff()
+plt.show()
