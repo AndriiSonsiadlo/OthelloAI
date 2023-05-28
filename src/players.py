@@ -14,7 +14,7 @@ class PlayerModel:
 
 
 class RLPlayer(PlayerModel):
-    def __init__(self, q_lr, discount_factor, net_lr=0.01, board_size=8):
+    def __init__(self, discount_factor=1, net_lr=0.01, board_size=8):
         # We ougth to use softmax in this
         # self.policy_net = nn.NN([64, 128, 128, 64, 64], net_lr)
         self.policy_net = nn.NN([board_size ** 2, board_size ** 2 * 2,  board_size ** 2 * 2,  board_size ** 2,  board_size ** 2], net_lr)
@@ -22,8 +22,6 @@ class RLPlayer(PlayerModel):
         # This ought to decay
         self.epsilon = 0.6
 
-        # Variables for Q learning
-        self.q_lr = q_lr
         self.discount_factor = discount_factor
         self.play_history = []
         self.wins = 0
@@ -107,7 +105,7 @@ class HumanPlayer(PlayerModel):
     def play(self, place_func, board_state, board, me, log_history=True):
         while True:
             try:
-                while len(pos := list(map(int, map(str.strip, input().split(" "))))) != 2:
+                while len(pos := list(map(int, map(str.strip, input().strip().split(" "))))) != 2:
                     print("Please enter two numbers separated by a space.")
 
                 if place_func(pos[0]-1, pos[1]-1):

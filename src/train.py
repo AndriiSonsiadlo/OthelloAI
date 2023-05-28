@@ -8,20 +8,20 @@ from game import Game
 from players import RLPlayer
 
 from matplotlib import pyplot as plt
-plt.ion()
 
-# qlr,gamma,netlr (0.03)
+# plt.ion()
+
+# gamma,netlr (0.03)
 
 board_size = 8
 match_size = 10
-n_epochs = 2000
+n_epochs = 20
 
-player = RLPlayer(0.07, 0.99, 0.03, board_size=board_size)
+player = RLPlayer(0.99, 0.03, board_size=board_size)
 rp = RLPlayer(0, 0, board_size=board_size)
 
-
 player_wins = []
-for e in range(1, n_epochs+1):
+for e in range(1, n_epochs + 1):
     print(f"Epoch: {e}")
 
     player.wins = 0
@@ -29,6 +29,7 @@ for e in range(1, n_epochs+1):
     player.epsilon = (np.exp(-0.017 * e) + 0.11) / 1.1
     player_gameplay_history = []
 
+    # number of games to play for one epoch
     for _ in range(match_size):
         # print("Game: %d"%g)
         player.play_history = []
@@ -36,7 +37,7 @@ for e in range(1, n_epochs+1):
         # Initialize a new game
         g = Game(player_1=player, log_history_1=True, player_2=rp, log_history_2=False, board_size=board_size)
         g.run()
-        # pprint(player.play_history)
+        # print(player.play_history)
 
         final_score = list(g.get_score().items())
         final_score.sort()
