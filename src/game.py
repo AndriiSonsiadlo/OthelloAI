@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from colorama import Back, Fore
 
-import board
+from src import board
 from src.players import PlayerModel
 
 
@@ -23,7 +23,7 @@ class Game:
         ]
 
     def get_score(self):
-        return self.board.get_score()
+        return self.board.score
 
     def run(self, show_board=False):
         if show_board:
