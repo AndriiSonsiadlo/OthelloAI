@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-import math
-import numpy as np
-import random
 import pickle
-from scipy.special import expit
+
+import numpy as np
 
 
 class NN:

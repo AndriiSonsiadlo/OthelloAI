@@ -68,7 +68,6 @@ class Game:
         if show_board:
             player1_score, player2_score = list(map(str, self.get_score().values()))
             print("\n\n\t" + Back.WHITE + Fore.BLACK + f"{'Game Over':^18}")
-            print(
-                "\t" + Back.YELLOW + Fore.BLACK + f"{'Winner: ' + 'Player 1' if player1_score > player2_score else 'Player 2':<18}")
+            print("\t" + Back.YELLOW + Fore.BLACK + f"{'Winner: ' + ('Player 1' if player1_score > player2_score else 'Player 2'):<18}")
             print("\t" + Back.MAGENTA + Fore.BLACK + f"{'Player 1: ' + player1_score:<18}")
             print("\t" + Back.MAGENTA + Fore.BLACK + f"{'Player 2: ' + player2_score:<18}")

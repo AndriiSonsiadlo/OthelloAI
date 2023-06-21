@@ -1,6 +1,5 @@
 import itertools
 import random
-from abc import ABC, abstractmethod
 
 import numpy as np
 
@@ -94,11 +93,11 @@ class RLPlayer(PlayerModel):
                 action, q = action_, q_
 
 
-#        print(len(self.play_history))
-#        for i in range(len(self.play_history)-1, -1, -1):
-#            print(i)
-#            t = self.policy_net.mkVec(targets[i])
-#            self.policy_net.backProp(state, t)
+        # print(len(self.play_history))
+        # for i in range(len(self.play_history)-1, -1, -1):
+        #    print(i)
+        #    t = self.policy_net.mkVec(targets[i])
+        #    self.policy_net.backProp(state, t)
 
 
 class HumanPlayer(PlayerModel):
@@ -115,10 +114,3 @@ class HumanPlayer(PlayerModel):
 
             print("Invalid values. Please enter two numbers (row and col) separated by a space.")
 
-def OneHot(index, dim):
-    """
-    Converts an index into a one-hot encoded column vector.
-    """
-    a = np.zeros((dim, 1))
-    a[index] = 1
-    return a

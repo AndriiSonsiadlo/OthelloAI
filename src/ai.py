@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 from tkinter import messagebox
 import numpy as np
@@ -179,7 +180,7 @@ class HumanPlayer:
 
 # Create RL and Human players
 rl_player = RLPlayer()
-rl_player.policy_net.load("./src/8size-best-linear-0.03.weights")
+rl_player.policy_net.load("./8size-best-linear-0.03.weights")
 human_player = HumanPlayer()
 
 # AI makes a move
@@ -198,6 +199,7 @@ def handle_click(event):
         if is_game_over():
             end_game()
         else:
+            time.sleep(0.5)
             ai_move()
 
 # End the game and show the result
