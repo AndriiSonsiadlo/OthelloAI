@@ -27,9 +27,9 @@ def main():
 
     if mode == "play":
         difficulty = {
-            "easy": os.path.join(app_dir, "models", "19024732-500-20-8-best-linear-0.03.weights"),
-            "medium": os.path.join(app_dir, "models", "19061554-100-10-8-best-linear-0.03.weights"),
-            "hard": os.path.join(app_dir, "models", "19062628-100-10-8-best-linear-0.03.weights")
+            "easy": os.path.join(app_dir, "models", "easy.weights"),
+            "medium": os.path.join(app_dir, "models", "medium.weights"),
+            "hard": os.path.join(app_dir, "models", "hard.weights")
         }
 
         if w1 == "easy":

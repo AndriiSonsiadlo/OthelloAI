@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import numpy as np
@@ -7,14 +8,12 @@ from src.game import Game
 from src.players import RLPlayer
 
 
-def main():
+def main(n_epochs=20, match_size=20, discount_factor=0.99, net_lr=0.03):
     plt.ion()
 
     board_size = 8
-    match_size = 20
-    n_epochs = 20
 
-    player = RLPlayer(0.99, 0.03, board_size=board_size)
+    player = RLPlayer(discount_factor, net_lr, board_size=board_size)
     rp = RLPlayer(0, 0, board_size=board_size)
 
     player_wins = []
@@ -56,17 +55,19 @@ def main():
 
     print("Wins:", sum(player_wins))
     dest_path = "./models"
+    os.makedirs(dest_path, exist_ok=True)
 
-    filename = f"{datetime.now().strftime('%d%H%M%S')}-{n_epochs}-{match_size}-{board_size}-best-linear-0.03"
+    filename = f"{datetime.now().strftime('%d%H%M%S')}-{n_epochs}-{match_size}-{board_size}-best-linear-{net_lr}"
     player.policy_net.save(f"{dest_path}/{filename}.weights")
     with open(f"{dest_path}/{filename}.csv", "w") as f:
         f.write("\n".join(map(str, player_wins)))
-    print("Saved:", filename)
+    print("Saved:", f"{dest_path}/{filename}")
 
     plt.plot(player_wins)
     plt.draw()
     plt.ioff()
     plt.show()
+
 
 if __name__ == '__main__':
     main()

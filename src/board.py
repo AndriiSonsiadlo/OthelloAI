@@ -1,8 +1,6 @@
 import sys
-from collections import defaultdict
 
 import numpy as np
-
 from colorama import init, Fore, Back, Style
 
 init(autoreset=True)
