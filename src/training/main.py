@@ -4,19 +4,20 @@ from pprint import pprint
 
 import numpy as np
 
-from game import Game
-from players import RLPlayer
-
 from matplotlib import pyplot as plt
+
+from src.game import Game
+from src.players import RLPlayer
+
 plt.ion()
 
 # qlr,gamma,netlr (0.03)
 
 board_size = 8
 match_size = 10
-n_epochs = 2000
+n_epochs = 100
 
-player = RLPlayer(0.07, 0.99, 0.03, board_size=board_size)
+player = RLPlayer(0.5, 0.8, 0.5, board_size=board_size)
 rp = RLPlayer(0, 0, board_size=board_size)
 
 
@@ -43,8 +44,7 @@ for e in range(1, n_epochs+1):
         ttl = sum(map(lambda x: x[1], final_score))
         # print(ttl)
 
-        # Only deal with 1 of the players (The one we're updating the
-        # weights for)
+        # Only deal with 1 of the players (The one we're updating the weights for)
         # player_score = int(final_score[0][1]/ttl >= 0.5)
         player_score = (final_score[0][1] / ttl - 0.5) * 2
         player.wins += player_score > 0
@@ -64,7 +64,7 @@ print(sum(player_wins))
 with open(f"{filename}.csv", "w") as f:
     f.write("\n".join(map(str, player_wins)))
 
-# plt.plot(player_wins)
-# plt.draw()
-# plt.ioff()
-# plt.show()
+plt.plot(player_wins)
+plt.draw()
+plt.ioff()
+plt.show()
