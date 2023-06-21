@@ -18,7 +18,7 @@ class RLPlayer(PlayerModel):
         self.policy_net = nn.NN([board_size ** 2, board_size ** 2 * 2, board_size ** 2 * 2, board_size ** 2, board_size ** 2], net_lr)
 
         # This ought to decay
-        self.epsilon = 0.6
+        self.epsilon = 0.2
         self.q_lr = q_lr
         self.discount_factor = discount_factor
         self.play_history = []
