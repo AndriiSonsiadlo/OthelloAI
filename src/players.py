@@ -3,7 +3,7 @@ import random
 
 import numpy as np
 
-import nn
+from src import nn
 from src.board import Board
 
 
