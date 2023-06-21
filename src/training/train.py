@@ -9,8 +9,8 @@ from src.players import RLPlayer
 plt.ion()
 
 board_size = 8
-match_size = 1
-n_epochs = 1
+match_size = 20
+n_epochs = 20
 
 player = RLPlayer(0.99, 0.03, board_size=board_size)
 rp = RLPlayer(0, 0, board_size=board_size)

@@ -38,14 +38,13 @@ class Game:
         while n_passed < 2:
             if show_board:
                 print("\n\t" + Back.WHITE + Fore.BLACK + f"{'Move ' + str(move_number):^18}")
-                print(
-                    "\t" + Back.MAGENTA + Fore.BLACK + f"{'Player 1: ' + str(self.get_score()[self.players[0].id]):<18}")
+                print("\t" + Back.MAGENTA + Fore.BLACK + f"{'Player 1: ' + str(self.get_score()[self.players[0].id]):<18}")
                 print("\t" + Back.CYAN + Fore.BLACK + f"{'Player 2: ' + str(self.get_score()[self.players[1].id]):<18}")
 
             n_passed = 0
 
             for i, player in enumerate(self.players, start=1):
-                print("\t" + Back.YELLOW + Fore.BLACK + f"{str(i) + ' player`s turn':<18}") if show_board else None
+                print("\t" + Back.YELLOW +  (Fore.RED if i == 1 else Fore.BLUE) + f"{str(i) + ' player`s turn':<18}") if show_board else None
                 # Pass the player a function it can use to make a move
                 # Player ids [-1, 1] are used to indicate which player is making the move
                 did_move = player.model.play(

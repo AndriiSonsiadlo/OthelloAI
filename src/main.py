@@ -1,21 +1,56 @@
 import argparse
+import os
+import sys
+from pathlib import Path
 
 from src.gui_tkinter import OthelloGame
 
 
 def main():
+    app_dir = sys._MEIPASS if getattr(sys, "frozen", False) else str(Path(__file__).parent.parent)
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('-g', '--gui', action='store_true', default=True)
+    parser.add_argument('-g', '--gui', action='store_true', default=False)
     parser.add_argument('-p1', '--player1', choices=["ai", "human"], type=str, default="human")
     parser.add_argument('-p2', '--player2', choices=["ai", "human"], type=str, default="ai")
-    parser.add_argument('-w1', '--weights', type=str)
-    parser.add_argument('-w2', '--weights', type=str)
+    parser.add_argument('-w1', '--weights1', type=str)
+    parser.add_argument('-w2', '--weights2', type=str)
+    parser.add_argument('-m', '--mode', choices=["train", "play"], type=str, default="play")
+    parser.add_argument('-d', '--difficulty', choices=["easy", "medium", "hard"], type=str, default="medium")
 
     args = parser.parse_args()
     p1 = args.player1
     p2 = args.player2
-    w1 = args.weights
-    w2 = args.weights
+    w1 = args.weights1
+    w2 = args.weights2
+
+    difficulty = {
+        "easy": os.path.join(app_dir, "models", "19024732-500-20-8-best-linear-0.03.weights"),
+        "medium": os.path.join(app_dir, "models", "19061554-100-10-8-best-linear-0.03.weights"),
+        "hard": os.path.join(app_dir, "models", "19062628-100-10-8-best-linear-0.03.weights")
+    }
+
+    if w1 == "easy":
+        w1 = difficulty["easy"]
+    elif w1 == "medium":
+        w1 = difficulty["medium"]
+    elif w1 == "hard":
+        w1 = difficulty["hard"]
+
+    if w2 == "easy":
+        w2 = difficulty["easy"]
+    elif w2 == "medium":
+        w2 = difficulty["medium"]
+    elif w2 == "hard":
+        w2 = difficulty["hard"]
+
+    if args.difficulty and (p1 == "human" and p2 == "ai" or p1 == "ai" and p2 == "human") and not w2 and not w1:
+        if args.difficulty == "easy":
+            w1 = w2 = difficulty["easy"]
+        elif args.difficulty == "medium":
+            w1 = w2 = difficulty["medium"]
+        elif args.difficulty == "hard":
+            w1 = w2 = difficulty["hard"]
 
     if args.gui:
         if p1 != "human" and p2 != "ai":
@@ -42,7 +77,7 @@ def main():
         game = Game(player_1, False, player_2, False, board_size=8)
         game.run(show_board=True)
 
-    exit(0)
+    sys.exit(0)
 
 
 if __name__ == '__main__':

@@ -13,14 +13,13 @@ class PlayerModel:
 
 
 class RLPlayer(PlayerModel):
-    def __init__(self, discount_factor=1, net_lr=0.01, board_size=8):
-        # We ougth to use softmax in this
+    def __init__(self, discount_factor=1, net_lr=0.01, q_lr=0.3, board_size=8):
         # self.policy_net = nn.NN([64, 128, 128, 64, 64], net_lr)
-        self.policy_net = nn.NN([board_size ** 2, board_size ** 2 * 2,  board_size ** 2 * 2,  board_size ** 2,  board_size ** 2], net_lr)
+        self.policy_net = nn.NN([board_size ** 2, board_size ** 2 * 2, board_size ** 2 * 2, board_size ** 2, board_size ** 2], net_lr)
 
         # This ought to decay
         self.epsilon = 0.6
-
+        self.q_lr = q_lr
         self.discount_factor = discount_factor
         self.play_history = []
         self.wins = 0
@@ -92,7 +91,6 @@ class RLPlayer(PlayerModel):
             if i != n_play_history:
                 action, q = action_, q_
 
-
         # print(len(self.play_history))
         # for i in range(len(self.play_history)-1, -1, -1):
         #    print(i)
@@ -107,10 +105,9 @@ class HumanPlayer(PlayerModel):
                 while len(pos := list(map(int, map(str.strip, input().strip().split(" "))))) != 2:
                     print("Please enter two numbers separated by a space.")
 
-                if place_func(pos[0]-1, pos[1]-1):
+                if place_func(pos[0] - 1, pos[1] - 1):
                     return True
             except ValueError:
                 pass
 
             print("Invalid values. Please enter two numbers (row and col) separated by a space.")
-

@@ -13,7 +13,8 @@ def compile_app():
             str(main_file.resolve()),
             "--name=Othello",
             "--clean",
-            "--onefile"
+            "--onefile",
+            "--add-data=models;models"
         ]
     )
 
