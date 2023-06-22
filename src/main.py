@@ -47,9 +47,9 @@ def main():
     n_epochs = args.n_epochs
 
     difficulty = {
-        "easy": os.path.join(app_dir, "models", "hard.weights"),
+        "easy": os.path.join(app_dir, "models", "easy.weights"),
         "medium": os.path.join(app_dir, "models", "medium.weights"),
-        "hard": os.path.join(app_dir, "models", "easy.weights")
+        "hard": os.path.join(app_dir, "models", "hard.weights")
     }
     w1 = difficulty.get(w1, w1)
     w2 = difficulty.get(w2, w2)
