@@ -22,6 +22,9 @@ class Game:
             Player(name="Player 2", model=player_2, id=1, log_history=log_history_2)
         ]
 
+    def clear_board(self):
+        self.board = board.Board(self.board.board_size)
+
     def get_score(self):
         return self.board.score
 
@@ -38,13 +41,16 @@ class Game:
         while n_passed < 2:
             if show_board:
                 print("\n\t" + Back.WHITE + Fore.BLACK + f"{'Move ' + str(move_number):^18}")
-                print("\t" + Back.MAGENTA + Fore.BLACK + f"{'Player 1: ' + str(self.get_score()[self.players[0].id]):<18}")
+                print(
+                    "\t" + Back.MAGENTA + Fore.BLACK + f"{'Player 1: ' + str(self.get_score()[self.players[0].id]):<18}")
                 print("\t" + Back.CYAN + Fore.BLACK + f"{'Player 2: ' + str(self.get_score()[self.players[1].id]):<18}")
 
             n_passed = 0
 
             for i, player in enumerate(self.players, start=1):
-                print("\t" + Back.YELLOW +  (Fore.RED if i == 1 else Fore.BLUE) + f"{str(i) + ' player`s turn':<18}") if show_board else None
+                if show_board:
+                    print("\t" + Back.YELLOW + (
+                        Fore.RED if i == 1 else Fore.BLUE) + f"{str(i) + ' player`s turn':<18}") if show_board else None
                 # Pass the player a function it can use to make a move
                 # Player ids [-1, 1] are used to indicate which player is making the move
                 did_move = player.model.play(
@@ -64,9 +70,18 @@ class Game:
             if not all(self.board.get_score().values()):
                 break
 
+        player1_score, player2_score = list(map(str, self.get_score().values()))
+        if player1_score > player2_score:
+            winner = 'Player 1'
+        elif player1_score < player2_score:
+            winner = 'Player 2'
+        else:
+            winner = 'Tie'
+
         if show_board:
-            player1_score, player2_score = list(map(str, self.get_score().values()))
             print("\n\n\t" + Back.WHITE + Fore.BLACK + f"{'Game Over':^18}")
-            print("\t" + Back.YELLOW + Fore.BLACK + f"{'Winner: ' + ('Player 1' if player1_score > player2_score else 'Player 2'):<18}")
+            print("\t" + Back.YELLOW + Fore.BLACK + f"{'Winner: ' + winner:<18}")
             print("\t" + Back.MAGENTA + Fore.BLACK + f"{'Player 1: ' + player1_score:<18}")
             print("\t" + Back.MAGENTA + Fore.BLACK + f"{'Player 2: ' + player2_score:<18}")
+
+        return winner
